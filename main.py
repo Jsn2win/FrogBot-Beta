@@ -110,11 +110,11 @@ async def setup(message):
     await message.channel.send(embed=embed)
     msg = await client.wait_for('message', check=authorcheck, timeout = 300)
 
-    if not await validRole(message, msg.content):
+    if not await validRole(message.guild.id, msg.content):
         embed = discord.Embed(title="Error", description="Invalid role specified", color=0xFF0000)
         await message.channel.send(embed=embed)
         return False
-    role = await validRole(message, msg.content)
+    role = await validRole(message.guild.id, msg.content)
     #save for future use
     DataJson['Verirole'][str(message.guild.id)] = role.id
     DataJson['setup'][str(message.guild.id)] = "True"
@@ -156,7 +156,7 @@ async def settings(message, arg1 = None, arg2 = None):
             await message.channel.send(embed=embed)
     if arg1 and arg2: #settings commands
         if arg1.lower() == "role":
-            role = await validRole(message, arg2)
+            role = await validRole(message.guild.id, arg2)
             if not role:
                 embed = discord.Embed(title="Error", description="Invalid role specified", color=0xFF0000)
                 await message.channel.send(embed=embed)
@@ -171,11 +171,6 @@ async def settings(message, arg1 = None, arg2 = None):
             embed = discord.Embed(title="Prefix", description=f"Changed prefix of this server to: **`{arg2}`**")
             await message.channel.send(embed=embed)
             
-@settings.error
-async def settings_error(message, error):
-    embedVar = discord.Embed(title="Error", description=str(error),
-                             color=0xFF0000)
-    await message.channel.send(embed=embedVar)
 #--------------------------------------VERIFICATION---------------------------------------------#
 
 @client.command()
