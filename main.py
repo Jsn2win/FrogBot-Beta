@@ -110,11 +110,11 @@ async def setup(message):
     await message.channel.send(embed=embed)
     msg = await client.wait_for('message', check=authorcheck, timeout = 300)
 
-    if not await validRole(message.guild.id, msg.content):
+    if not await validRole(message, msg.content):
         embed = discord.Embed(title="Error", description="Invalid role specified", color=0xFF0000)
         await message.channel.send(embed=embed)
         return False
-    role = await validRole(message.guild.id, msg.content)
+    role = await validRole(message, msg.content)
     #save for future use
     DataJson['Verirole'][str(message.guild.id)] = role.id
     DataJson['setup'][str(message.guild.id)] = "True"
@@ -156,7 +156,7 @@ async def settings(message, arg1 = None, arg2 = None):
             await message.channel.send(embed=embed)
     if arg1 and arg2: #settings commands
         if arg1.lower() == "role":
-            role = await validRole(message.guild.id, arg2)
+            role = await validRole(message.guild.roles, arg2)
             if not role:
                 embed = discord.Embed(title="Error", description="Invalid role specified", color=0xFF0000)
                 await message.channel.send(embed=embed)
@@ -171,6 +171,11 @@ async def settings(message, arg1 = None, arg2 = None):
             embed = discord.Embed(title="Prefix", description=f"Changed prefix of this server to: **`{arg2}`**")
             await message.channel.send(embed=embed)
             
+@settings.error
+async def settings_error(message, error):
+    embedVar = discord.Embed(title="Error", description=str(error),
+                             color=0xFF0000)
+    await message.channel.send(embed=embedVar)
 #--------------------------------------VERIFICATION---------------------------------------------#
 
 @client.command()
@@ -182,10 +187,7 @@ async def verify(message):
         embed = discord.Embed(title="Error", description="Bot not set up, please contact a server administrator", color=0xFF0000)
         await message.channel.send(embed=embed)
         return False
-    if not await validRole(message.guild.roles, msg.content):
-        embed = discord.Embed(title="Error", description=f"Please contact your server administrator with the following error code:\n`Role {validRole(message.guild.roles, DataJson['Verirole'][str(message.guild.id)]).name} not found`", color=0xFF0000)
-        await message.channel.send(embed=embed)
-        return False
+    role = discord.utils.get(message.guild.roles, id=DataJson['Verirole'][str(message.guild.id)])
     if role in author.roles:
         embed = discord.Embed(title="Error", description="You are already verified in this server", color=0xFF0000)
         await message.channel.send(embed=embed)
