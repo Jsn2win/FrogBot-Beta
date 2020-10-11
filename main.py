@@ -192,6 +192,12 @@ async def verify(message):
         embed = discord.Embed(title="Error", description="You are already verified in this server", color=0xFF0000)
         await message.channel.send(embed=embed)
         return False
+    try:
+        role.id
+    except AttributeError:
+        embed= discord.Embed(title="Error", description="Specified role not found, please contact a server administrator", color=0xFF0000)
+        await message.channel.send(embed=embed)
+        return False
     embed = discord.Embed(title="Verification", description="Check your DM's to continue the verification process", color=0x808080)
     await message.channel.send(author.mention, embed=embed)
     channel = await author.create_dm()
