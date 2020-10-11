@@ -144,7 +144,7 @@ async def settings(message, arg1 = None, arg2 = None):
     #settings help command
 
     if (not arg1 and not arg2) or (arg1.lower() == "help"):
-        embed=discord.Embed(title="Settings help", description="**`help`**: Show this help message\n**`role`**: Configure the verification role\n**`prefix`**: Configure the server's prefix for the bot")
+        embed=discord.Embed(title="Settings help", description="**`help`**: Show this help message\n**`role`**: Configure the verification role\n**`prefix`**: Configure the server's prefix for the bot\n**`levels`**: Configure the verification system")
         await message.channel.send(embed=embed)
 
     if arg1 and not arg2:
