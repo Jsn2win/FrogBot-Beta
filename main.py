@@ -154,7 +154,11 @@ async def settings(message, arg1 = None, arg2 = None):
         elif arg1.lower() == "prefix":
             embed = discord.Embed(title="Server prefix", description='**Description**: The prefix for the bot this server will use\n **Usage**: `settings prefix [prefix]`')
             await message.channel.send(embed=embed)
+        elif arg1.lower() == "levels":
+            embed = discord.Embed(title="Verification Levels", description='**Description**: What types of verification users will go through\n **Usage**: Please use `settings levels help` to get a comprehensive list of all commands')
+            await message.channel.send(embed=embed)
     if arg1 and arg2: #settings commands
+        #ROLE CONFIGURATION
         if arg1.lower() == "role":
             role = await validRole(message.guild.roles, arg2)
             if not role:
@@ -165,11 +169,20 @@ async def settings(message, arg1 = None, arg2 = None):
             readdata.jsonsave(r'Storage/data.json', DataJson)
             embed = discord.Embed(title="Success!", description="Successfully configured role")
             await message.channel.send(embed=embed)
+            
+        #PREFIX CONFIGURATION
         elif arg1.lower() == "prefix":
             DataJson['prefix'][str(message.guild.id)] = arg2
             readdata.jsonsave(r'Storage/data.json', DataJson)
             embed = discord.Embed(title="Prefix", description=f"Changed prefix of this server to: **`{arg2}`**")
             await message.channel.send(embed=embed)
+            
+        #VERIFICATION CONFIGURATION
+        elif arg1.lower() == "levels":
+            if arg2.lower() == "help":
+                embed = discord.Embed(title="Commands", description="**`Reaction`**: Users must react to a specific message with a check mark\n**`Word`**: users must say a randomly chosen word\n **`Captcha`**: Users must pass a captcha of distorted letters (*Recommended*)\n/***NOTE**: You can have multiple systems active at once (A user must pass a Reaction verification AND a Word verification)*")
+                await message.channel.send(embed=embed)
+            
             
 @settings.error
 async def settings_error(message, error):
