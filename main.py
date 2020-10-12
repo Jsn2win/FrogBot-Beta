@@ -193,9 +193,25 @@ async def settings(message, arg1 = None, arg2 = None, arg3 = None):
             yes = ['yes', 'true', 'on', 'active']
             no = ['no', 'false', 'off', 'inactive']
             
-            elif vlev == "reaction":
+            if vlev == "reaction":
                 if stat in yes:
-                   
+                    DataJson['verification']['reaction'][str(message.guild.id)] = True
+                if stat in no:
+                    DataJson['verification']['reaction'][str(message.guild.id)] = False
+            
+            elif vlev == "word":
+                if stat in yes:
+                    DataJson['verification']['word'][str(message.guild.id)] = True
+                if stat in no:
+                    DataJson['verification']['word'][str(message.guild.id)] = False
+                    
+            elif vlev == "captcha":
+                if stat in yes:
+                    DataJson['verification']['captcha'][str(message.guild.id)] = True
+                if stat in no:
+                    DataJson['verification']['captcha'][str(message.guild.id)] = False
+            
+            readdata.jsonsave(r'Storage/data.json', DataJson)
                 
                 
                 
