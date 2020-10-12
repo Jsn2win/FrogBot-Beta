@@ -8,7 +8,7 @@ from claptcha import Claptcha
 from utils import readdata, Hashify
 from utils.verifyrole import validRole
 from assets import emojis
-
+from utils.randoml import random_line
 #----Utilities-#
 import discord
 import discord.utils
@@ -267,10 +267,11 @@ async def verify(message):
     if DataJson['verification']['captcha'][str(message.guild.id)] == "True":
         image = discord.File(c.bytes[1], filename="captcha.png")
         embed.set_image(url="attachment://captcha.png")
-    await channel.send(file=image, embed=embed)
+        await channel.send(file=image, embed=embed)
+    else: await channel.send(embed=embed)
 
     if DataJson['verification']['captcha'][str(message.guild.id)] == "True":
-        msg = await client.wait_for('message', check = lambda m: m.author==author)
+        msg = await client.wait_for('message')
         if msg.content != captchatext:
             embed = discord.Embed(title="Captcha Failed", color=0xFF0000)
             await channel.send(embed=embed)
@@ -293,8 +294,7 @@ async def verify(message):
         random.shuffle(emojiarr)
         for e in emojiarr:
             await msg.add_reaction(e)
-        def authorCheck(reaction, user): return user == author
-        msgreaction, user = await client.wait_for('reaction_add', timeout=180.0, check=authorCheck)
+        msgreaction, user = await client.wait_for('reaction_add', timeout=180.0)
         if not msgreaction.emoji == reaction:
             embed = discord.Embed(title="Captcha Failed", color=0xFF0000)
             await channel.send(embed=embed)
@@ -303,7 +303,11 @@ async def verify(message):
     randomWord = random_line('Storage/words.txt')
     def check(message): return message.content == randomWord
     await channel.send(f"Please say the magic word: `{randomWord}`")
-    msg = await client.wait_for('message', check = check, timeout = 180.0)      
+    msg = await client.wait_for('message', timeout = 180.0)
+    if msg.content != randomWord:
+        embed = discord.Embed(title="Captcha Failed", color=0xFF0000)
+        await channel.send(embed=embed)
+        return
     
     role = discord.utils.get(message.guild.roles, id=DataJson['Verirole'][str(message.guild.id)])
     await author.add_roles(role)
