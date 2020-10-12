@@ -195,23 +195,30 @@ async def settings(message, arg1 = None, arg2 = None, arg3 = None):
             
             if vlev == "reaction":
                 if stat in yes:
-                    DataJson['verification']['reaction'][str(message.guild.id)] = True
+                    DataJson['verification']['reaction'][str(message.guild.id)] = "True"
+                    embed = discord.Embed(title = "Success!", description="Activated Reaction verification")
                 if stat in no:
-                    DataJson['verification']['reaction'][str(message.guild.id)] = False
+                    DataJson['verification']['reaction'][str(message.guild.id)] = "False"
+                    embed = discord.Embed(title = "Success!", description="Deativated Reaction verification")
             
             elif vlev == "word":
                 if stat in yes:
-                    DataJson['verification']['word'][str(message.guild.id)] = True
+                    DataJson['verification']['word'][str(message.guild.id)] = "True"
+                    embed = discord.Embed(title = "Success!", description="Activated Word verification")
                 if stat in no:
-                    DataJson['verification']['word'][str(message.guild.id)] = False
+                    DataJson['verification']['word'][str(message.guild.id)] = "False"
+                    embed = discord.Embed(title = "Success!", description="Deactivated Word verification")
                     
             elif vlev == "captcha":
                 if stat in yes:
-                    DataJson['verification']['captcha'][str(message.guild.id)] = True
+                    DataJson['verification']['captcha'][str(message.guild.id)] = "True"
+                    embed = discord.Embed(title = "Success!", description="Activated Captcha verification")
                 if stat in no:
-                    DataJson['verification']['captcha'][str(message.guild.id)] = False
+                    DataJson['verification']['captcha'][str(message.guild.id)] = "False"
+                    embed = discord.Embed(title = "Success!", description="Deactivated Captcha verification")
             
             readdata.jsonsave(r'Storage/data.json', DataJson)
+            message.channel.send(embed=embed)
                 
                 
                 

@@ -1,0 +1,27 @@
+{
+    "Verirole": {
+        "755051551860457562": 764992263498498058,
+        "None": "None"
+    },
+    "prefix": {
+        "755051551860457562": "dm.",
+        "None": "None"
+    },
+    "setup": {
+        "755051551860457562": "True",
+        "None": "None"
+    },
+    "verification": {
+        "None": "None",
+        "captcha": {
+            "None": "None"
+        },
+        "reaction": {
+            "755051551860457562": "False",
+            "None": "None"
+        },
+        "word": {
+            "None": "None"
+        }
+    }
+}
