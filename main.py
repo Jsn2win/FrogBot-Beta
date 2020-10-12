@@ -8,6 +8,7 @@ from claptcha import Claptcha
 from utils import readdata, Hashify
 from utils.verifyrole import validRole
 from assets import emojis
+
 #----Utilities-#
 import discord
 import discord.utils
@@ -116,8 +117,13 @@ async def setup(message):
         return False
     role = await validRole(message, msg.content)
     #save for future use
-    DataJson['Verirole'][str(message.guild.id)] = role.id
-    DataJson['setup'][str(message.guild.id)] = "True"
+    gid = str(message.guild.id)
+    DataJson['Verirole'][gid] = role.id
+    DataJson['setup'][gid] = "True"
+    DataJson['verification']['reaction'][gid] = "False"
+    DataJson['verification']['word'][gid] = "False"
+    DataJson['verification']['captcha'][gid] = "False"
+    
     readdata.jsonsave(r'Storage/data.json', DataJson)
     print(DataJson)
 
@@ -218,7 +224,7 @@ async def settings(message, arg1 = None, arg2 = None, arg3 = None):
                     embed = discord.Embed(title = "Success!", description="Deactivated Captcha verification")
             
             readdata.jsonsave(r'Storage/data.json', DataJson)
-            message.channel.send(embed=embed)
+            await message.channel.send(embed=embed)
                 
                 
                 
@@ -258,38 +264,47 @@ async def verify(message):
     c = Claptcha(captchatext, r'assets/Carlito-Regular.ttf')
     #send captcha
     embed = discord.Embed(title="Verification", description=f"Hello. Welcome to the {message.guild} server.\nPlease complete the following captchas to get access to the server.")
-    image = discord.File(c.bytes[1], filename="captcha.png")
-    embed.set_image(url="attachment://captcha.png")
+    if DataJson['verification']['captcha'][str(message.guild.id)] == "True":
+        image = discord.File(c.bytes[1], filename="captcha.png")
+        embed.set_image(url="attachment://captcha.png")
     await channel.send(file=image, embed=embed)
 
-    msg = await client.wait_for('message', check = lambda m: m.author==author)
-    if msg.content != captchatext:
-        embed = discord.Embed(title="Captcha Failed", color=0xFF0000)
-        await channel.send(embed=embed)
-        return
+    if DataJson['verification']['captcha'][str(message.guild.id)] == "True":
+        msg = await client.wait_for('message', check = lambda m: m.author==author)
+        if msg.content != captchatext:
+            embed = discord.Embed(title="Captcha Failed", color=0xFF0000)
+            await channel.send(embed=embed)
+            return
 
-    check = random.randint(1, 3)
-    if check == 1: reaction = u"\u2705"
-    if check == 2: reaction = u"\u2611"
-    if check == 3: reaction = u"\u2714"
-    msgc = 'React to this message with the check emoji'
-    msg = await channel.send(msgc)
-    emojiarr = [reaction]
-    oldemoji = ""
-    for c in range(3):
-        emoji = random.choice(emojis.emojistring)
-        while emoji == oldemoji:
+    if DataJson['verification']['reaction'][str(message.guild.id)] == "True":
+        check = random.randint(1, 3)
+        if check == 1: reaction = u"\u2705"
+        if check == 2: reaction = u"\u2611"
+        if check == 3: reaction = u"\u2714"
+        msgc = 'React to this message with the check emoji'
+        msg = await channel.send(msgc)
+        emojiarr = [reaction]
+        oldemoji = ""
+        for c in range(3):
             emoji = random.choice(emojis.emojistring)
-        emojiarr += [emoji]
-    random.shuffle(emojiarr)
-    for e in emojiarr:
-        await msg.add_reaction(e)
-    def authorCheck(reaction, user): return user == author
-    msgreaction, user = await client.wait_for('reaction_add', timeout=180.0, check=authorCheck)
-    if not msgreaction.emoji == reaction:
-        embed = discord.Embed(title="Captcha Failed", color=0xFF0000)
-        await channel.send(embed=embed)
-        return
+            while emoji == oldemoji:
+                emoji = random.choice(emojis.emojistring)
+            emojiarr += [emoji]
+        random.shuffle(emojiarr)
+        for e in emojiarr:
+            await msg.add_reaction(e)
+        def authorCheck(reaction, user): return user == author
+        msgreaction, user = await client.wait_for('reaction_add', timeout=180.0, check=authorCheck)
+        if not msgreaction.emoji == reaction:
+            embed = discord.Embed(title="Captcha Failed", color=0xFF0000)
+            await channel.send(embed=embed)
+            return
+          
+    randomWord = random_line('Storage/words.txt')
+    def check(message): return message.content == randomWord
+    await channel.send(f"Please say the magic word: `{randomWord}`")
+    msg = await client.wait_for('message', check = check, timeout = 180.0)      
+    
     role = discord.utils.get(message.guild.roles, id=DataJson['Verirole'][str(message.guild.id)])
     await author.add_roles(role)
     await channel.send(f"Congratulations, you have been verified in the {message.guild} server!")
