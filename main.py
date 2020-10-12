@@ -133,7 +133,7 @@ async def setup_error(message, error):
 
 @client.command()
 @has_guild_permissions(manage_guild=True)
-async def settings(message, arg1 = None, arg2 = None):
+async def settings(message, arg1 = None, arg2 = None, arg3 = None):
     try: #test if user ran setup
         DataJson['setup'][str(message.guild.id)]
     except KeyError:
@@ -157,6 +157,7 @@ async def settings(message, arg1 = None, arg2 = None):
         elif arg1.lower() == "levels":
             embed = discord.Embed(title="Verification Levels", description='**Description**: What types of verification users will go through\n **Usage**: Please use `settings levels help` to get a comprehensive list of all commands')
             await message.channel.send(embed=embed)
+            
     if arg1 and arg2: #settings commands
         #ROLE CONFIGURATION
         if arg1.lower() == "role":
@@ -179,10 +180,25 @@ async def settings(message, arg1 = None, arg2 = None):
             
         #VERIFICATION CONFIGURATION
         elif arg1.lower() == "levels":
-            if arg2.lower() == "help":
-                embed = discord.Embed(title="Commands", description="**`Reaction`**: Users must react to a specific message with a check mark\n**`Word`**: users must say a randomly chosen word\n **`Captcha`**: Users must pass a captcha of distorted letters (*Recommended*)\n/***NOTE**: You can have multiple systems active at once (A user must pass a Reaction verification AND a Word verification)*")
+            vlev = arg2.lower()
+            
+            if vlev == "help":
+                embed = discord.Embed(title="Commands", description="**`Reaction`**: Users must react to a specific message with a check mark\n**`Word`**: users must say a randomly chosen word\n **`Captcha`**: Users must pass a captcha of distorted letters (*Recommended*)\n***NOTE**: You can have multiple systems active at once (A user must pass a Reaction verification AND a Word verification)*")
                 await message.channel.send(embed=embed)
             
+            if not arg3:
+                return
+            stat = arg3.lower()
+            
+            yes = ['yes', 'true', 'on', 'active']
+            no = ['no', 'false', 'off', 'inactive']
+            
+            elif vlev == "reaction":
+                if stat in yes:
+                   
+                
+                
+                
             
 @settings.error
 async def settings_error(message, error):

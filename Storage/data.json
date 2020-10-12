@@ -10,5 +10,16 @@
     "setup": {
         "755051551860457562": "True",
         "None": "None"
+    },
+    "verification": {
+        "reaction": {
+            "None": "None"
+        },
+        "word": {
+            "None": "None"
+        },
+        "reaction": {
+            "None": "None"
+        }
     }
 }
