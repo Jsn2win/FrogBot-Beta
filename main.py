@@ -294,7 +294,7 @@ async def verify(message):
         random.shuffle(emojiarr)
         for e in emojiarr:
             await msg.add_reaction(e)
-        async def ac(reaction, user): return user == mess
+        def ac(reaction, user): return user == message.author
         msgreaction, user = await client.wait_for('reaction_add', timeout=180.0, check = ac)
         if not msgreaction.emoji == reaction:
             embed = discord.Embed(title="Captcha Failed", color=0xFF0000)

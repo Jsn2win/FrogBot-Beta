@@ -14,7 +14,7 @@
     "verification": {
         "None": "None",
         "captcha": {
-            "755051551860457562": "False",
+            "755051551860457562": "True",
             "None": "None"
         },
         "reaction": {
