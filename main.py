@@ -22,7 +22,7 @@ import threading
 
 
 DataJson = readdata.jsonload(r'Storage/data.json')
-default_prefix = "dev.fm."
+default_prefix = "beta.fm."
 async def getPrefix(bot, message):
     return DataJson['prefix'].get(str(message.guild.id), default_prefix)
 
@@ -75,7 +75,7 @@ async def info(message):
 
     embed.add_field(name = 'Ping', value = f"`{round(client.latency*1000,1)} ms`", inline = True)
     embed.add_field(name = 'Python version', value = f"`{sys.version_info[0]}.{sys.version_info[1]}.{sys.version_info[2]}`", inline = True)
-    embed.add_field(name = 'Support server', value = f"[`discord.gg/Zp2Ts3A`](https://discord.gg/Zp2Ts3A)", inline = True)
+    embed.add_field(name = 'Support server', value = f"[`discord.gg/HNUefyt`](https://discord.gg/HNUefyt)", inline = True)
     embed.set_footer(text=u"❤️Made with love❤️")
     await message.channel.send(embed=embed)
 
@@ -111,11 +111,11 @@ async def setup(message):
     await message.channel.send(embed=embed)
     msg = await client.wait_for('message', check=authorcheck, timeout = 300)
 
-    if not await validRole(message, msg.content):
+    if not await validRole(message.guild.roles, msg.content):
         embed = discord.Embed(title="Error", description="Invalid role specified", color=0xFF0000)
         await message.channel.send(embed=embed)
         return False
-    role = await validRole(message, msg.content)
+    role = await validRole(message.guild.roles, msg.content)
     #save for future use
     gid = str(message.guild.id)
     DataJson['Verirole'][gid] = role.id
@@ -316,22 +316,28 @@ async def verify(message):
     
 #--------------------------------------OWNER COMMANDS---------------------------------------------#
 
-async def __is_owner(message):
+async def is_owner(message):
     return message.author.id == 722249619177996400
 
 @client.command(pass_context=True)
-@commands.check(__is_owner)
-async def __restart__(message):
+@commands.check(is_owner)
+async def __presence__(message, arg1 = "Playing", *arg2):
+    reset = False
     await message.message.delete()
-    for x in range(4):
-        await message.channel.send(f"Snipe Protect #{x}", delete_after=0)
-    embedvar = discord.Embed(title = "Restarting...")
-    messageemb = await message.channel.send(embed=embedvar)
-    with open('restart', 'w') as file:
-        file.write(str(message.channel.id) + "\n" + str(messageemb.id))
-    raise SystemExit
+    keys = {'servers': len(client.guilds)}
+    if not arg2: reset = True
+    arg2 = ' '.join(arg2).format(**keys)
+    if reset == True: arg2 = "Frogger"
+    if arg1.lower() == "watching":
+        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=arg2))
+    if arg1.lower() == "playing":
+        await client.change_presence(activity=discord.Game(name=arg2))
+    if arg1.lower() == "listening":
+        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=arg2))
 
-@__restart__.error
+    
+
+@__presence__.error
 async def restart_error(message, error):
     embedvar = discord.Embed(title = "Error", description = str(error), color = 0xFF0000)
     await message.channel.send(embed=embedvar)
